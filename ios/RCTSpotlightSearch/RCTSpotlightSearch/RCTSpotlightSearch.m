@@ -15,6 +15,7 @@
 static NSString *const kHandleContinueUserActivityNotification = @"handleContinueUserActivity";
 static NSString *const kUserActivityKey = @"userActivity";
 static NSString *const kSpotlightSearchItemTapped = @"spotlightSearchItemTapped";
+static NSString *const kSpotlightSearchInApp = @"spotlightSearchInApp";
 static NSString * initialIdentifier = @"";
 
 @interface RCTSpotlightSearch ()
@@ -63,7 +64,7 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[kSpotlightSearchItemTapped];
+    return @[kSpotlightSearchItemTapped, kSpotlightSearchInApp];
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -108,18 +109,19 @@ RCT_EXPORT_MODULE();
 
 - (void)handleContinueUserActivity:(NSUserActivity *)userActivity {
     NSString *uniqueItemIdentifier = userActivity.userInfo[CSSearchableItemActivityIdentifier];
+    NSString *query = userActivity.userInfo[CSSearchQueryString];
     
-    if (!uniqueItemIdentifier) {
-        return;
-    }
-
-    initialIdentifier = uniqueItemIdentifier;
-    
-    if (!self.hasListeners) {
+    if (!self.hasListeners || (!uniqueItemIdentifier && !query)) {
         return;
     }
     
-    [self sendEventWithName:kSpotlightSearchItemTapped body:uniqueItemIdentifier];
+    if (uniqueItemIdentifier) {
+        initialIdentifier = uniqueItemIdentifier;
+        [self sendEventWithName:kSpotlightSearchItemTapped body:uniqueItemIdentifier];
+    } else if (query) {
+        initialIdentifier = query;
+        [self sendEventWithName:kSpotlightSearchInApp body:query];
+    }
 }
 
 RCT_EXPORT_METHOD(getInitialSearchItem:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {

@@ -23,3 +23,5 @@ export function deleteAllItems(): Promise<void>
 export function searchItemTapped(callback: (uniqueIdentifier: string) => void): NativeEventSubscription;
 
 export function getInitialSearchItem(): Promise<string>
+
+export function searchInApp(callback: (query: string) => void): NativeEventSubscription;

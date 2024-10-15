@@ -4,6 +4,7 @@ const {SpotlightSearch} = NativeModules;
 const spotlightEventEmitter = new NativeEventEmitter(SpotlightSearch);
 
 const EVENT_ITEM_TAPPED = 'spotlightSearchItemTapped';
+const SEARCH_IN_APP = 'spotlightSearchInApp';
 const nullFunc = () => {};
 
 export default {
@@ -33,6 +34,10 @@ export default {
     }),
     searchItemTapped: Platform.select({
         ios: (callback) => spotlightEventEmitter?.addListener(EVENT_ITEM_TAPPED, callback),
+        android: nullFunc
+    }),
+    searchInApp: Platform.select({
+        ios: (callback) => spotlightEventEmitter?.addListener(SEARCH_IN_APP, callback),
         android: nullFunc
     }),
 }
